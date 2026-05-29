@@ -3,10 +3,6 @@
 Sandra testar. Och testar igen, tjohoo.
 Christine lägger in en rad.. testing testing
 
-# yh-message-app-fullstack
-
-Sandra testar. Och testar igen, tjohoo.
-Christine lägger in en rad.. testing testing
 
 DUBBELKOLLA
 Inloggningsformulär tillåter enbart text och har maxantal tecken - DUBBELKOLLA KODEN VIA AI FÖR ATT SE ATT DETTA FINNS PÅ PLATS
