@@ -10,6 +10,7 @@ import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
+import { body, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -25,34 +26,39 @@ app.get("/", (req, res) => {
   res.send(listEndpoints(app))
 })
 
-app.post("/register", async (req, res) => {
+app.post("/register", [
+  body("username").isLength({ min: 6, max: 25 }).withMessage("Username must be between 6 and 25 characters"), // Adderade validering för användarnamn
+  body("email").isEmail().normalizeEmail(), // Validerar att email är i korrekt format och normaliserar det
+  body("password").isLength({ min: 10, max: 64 }).withMessage("Password must be between 10 and 64 characters") // Adderade validering för lösenordslängd
+], async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: "Failed to register. Check your user name and password.", errors: errors.array() }) // Förenklade felmeddelandet och inkluderade detaljerad information om valideringsfel i svaret.
+  } 
+
   try {
     const { email, password, username } = req.body
 
-    if (!username || username.trim().length < 2) {
-      return res.status(400).json({ success: false, message: "Username must be at least 2 characters" })
-    }
-
     const existingUser = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { username: username.trim() }]
+      $or: [{ email: email }, { username: username.trim() }]
     })
 
     if (existingUser) {
-      const field = existingUser.email === email.toLowerCase() ? "email" : "username"
+      const field = existingUser.email === email ? "email" : "username"
       return res.status(400).json({
         success: false,
         message: `A user with this ${field} already exists`
       })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const user = new User({ username: username.trim(), email, password: hashedPassword })
+    const hashedPassword = await bcrypt.hash(password, 10) 
+    const user = new User({ username: username.trim(), email, password: hashedPassword }) 
     await user.save()
 
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "1h" } 
     )
 
     res.status(201).json({
@@ -64,14 +70,14 @@ app.post("/register", async (req, res) => {
         accessToken,
       },
     })
-  } catch (error) {
+  } catch (error) { // <--- FIX 3: Fångar upp eventuella fel under processen
     res.status(400).json({
       success: false,
       message: "Could not create user",
       error: error,
     })
-  }
-})
+  } 
+}) 
 
 app.post("/login", async (req, res) => {
   try {
@@ -100,7 +106,7 @@ app.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "1h" } //Lowered token expiration time to 1 hour for better security
     )
 
     res.json({
