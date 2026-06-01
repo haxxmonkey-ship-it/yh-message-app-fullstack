@@ -17,13 +17,39 @@ Salting + Hashing - KOLLA HUR MAN GÖR OCH VAR?
 Samtliga händelser loggas, när och varifrån - KOLLA MED AI HUR OCH VAR
 ---------------------------------
 KODNING/AKTIVERING
-- Vi ändrar i .env-filen - JWT_SECRET
+- Vi ändrar i .env-filen - JWT_SECRET - NEJ!!!!
 - Minimikrav för lösenord, 10 tecken, 1 siffra, 1 specialtecken - SERVER.JS - FINNS I JS
 - Implementera Session Timeout, 60 min - SERVER.JS - FINNS I JS (rad 28 + 76)
-- Begränsa antal försök att logga in (5 försök, sedan paus på 15 min) - SERVER.JS
+- Begränsa antal försök att logga in (5 försök, sedan paus på 15 min) - SERVER.JS (finns ej)
 - Max 3 antal inloggade enheter samtidigt - godkännande via annan enhet vid ny inloggning - SERVER.JS
 - Revision av dependencies - NPM AUDIT - kommando - i package.json - Github Dependent Bot (funktion)
 - ta bort undantaget för env.example i .gitignore
+
+--------------------------------------------
+
+RAD 168 - SAKNAR AUTHENTICATEUSER - ÄNDRA TILL
+import jwt from "jsonwebtoken"
+import { User } from "../models/User.js"
+
+export const authenticateUser = async (req, res, next) => {
+  const token = req.headers.authorization?.replace("Bearer ", "")
+  if (!token) {
+    return res.status(401).json({ success: false, message: "No token provided" })
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const user = await User.findById(decoded.userId)
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User not found" })
+    }
+    req.user = user
+    next()
+  } catch (err) {
+    res.status(401).json({ success: false, message: "Invalid token" })
+  }
+}
+
+
 ------------------------------------
 BOCKA AV:
 - Användaren ska skapa meddelanden
