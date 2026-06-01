@@ -58,7 +58,7 @@ app.post("/register", [
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } 
+      { expiresIn: "1h" } // Sänkte token expiration time till 1 timme för ökad säkerhet
     )
 
     res.status(201).json({
@@ -70,7 +70,7 @@ app.post("/register", [
         accessToken,
       },
     })
-  } catch (error) { // <--- FIX 3: Fångar upp eventuella fel under processen
+  } catch (error) { 
     res.status(400).json({
       success: false,
       message: "Could not create user",
@@ -79,7 +79,16 @@ app.post("/register", [
   } 
 }) 
 
-app.post("/login", async (req, res) => {
+app.post("/login", [ // Validering av indata för login adderad via Express-validator
+  body("login").trim().notEmpty().withMessage("Username or email is required"),
+  body("password").notEmpty().withMessage("Password is required")
+], async (req, res) => {
+  // 1. Kontrollera om valideringen hittade tomma fält
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: "Validation failed", errors: errors.array() })
+  }
+
   try {
     const { login, password } = req.body
     const user = await User.findOne({
@@ -106,7 +115,7 @@ app.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" } //Lowered token expiration time to 1 hour for better security
+      { expiresIn: "1h" } //Sänkte token expiration time till 1 timme för ökad säkerhet
     )
 
     res.json({
@@ -128,6 +137,12 @@ app.post("/login", async (req, res) => {
 })
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id)
+
+
+
+
+
+
 
 app.get("/messages", async (req, res) => {
   try {
