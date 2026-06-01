@@ -19,7 +19,7 @@ Samtliga händelser loggas, när och varifrån - KOLLA MED AI HUR OCH VAR
 KODNING/AKTIVERING
 - Vi ändrar i .env-filen - JWT_SECRET
 - Minimikrav för lösenord, 10 tecken, 1 siffra, 1 specialtecken - SERVER.JS - FINNS I JS
-- Implementera Session Timeout, 60 min - SERVER.JS - FINNS I JS
+- Implementera Session Timeout, 60 min - SERVER.JS - FINNS I JS (rad 28 + 76)
 - Begränsa antal försök att logga in (5 försök, sedan paus på 15 min) - SERVER.JS
 - Max 3 antal inloggade enheter samtidigt - godkännande via annan enhet vid ny inloggning - SERVER.JS
 - Revision av dependencies - NPM AUDIT - kommando - i package.json - Github Dependent Bot (funktion)
