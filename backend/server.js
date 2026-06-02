@@ -21,6 +21,7 @@ app.use(cors({
   origin: "*",
 }))
 app.use(express.json())
+// Vi föreslår att säkra session-tokeln genom att använda HttpOnly cookies istället för att skicka den i JSON-responsen, vilket minskar risken för XSS-attacker. Det här innebär större ändringar i övrig kod för att hantera autentisering och session, vi har valt att inte genomföra detta själva. 
 
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
