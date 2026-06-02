@@ -83,7 +83,9 @@ export const SingleMessage = ({ message, user, onUnauthorized, fetchPosts }) => 
         )}
 
         <div className="message-actions">
-          <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>
+          {isOwner && ( //endast visa delete-knappen för ägaren av meddelandet 
+            <button type="button" className="delete-btn" onClick={onDelete}>🗑️</button>
+          )}
 
           {isOwner && !isEditing && (
             <button type="button" className="edit-btn" onClick={() => setIsEditing(true)}>✏️</button>
