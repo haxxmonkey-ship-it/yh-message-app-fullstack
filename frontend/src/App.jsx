@@ -18,7 +18,7 @@ export const App = () => {
       .then((data) => setMessageList(data))
       .catch((error) => console.error(error))
       .finally(() => setLoading(false))
-  }
+  }//vi rekommenderar att man gör meddelanden osynliga för ej inloggade användare. Åtgärdat i backend men inte i frontend, vi har valt att inte implementera detta i frontend-koden för att inte göra den onödigt komplex.
   useEffect(() => {
     fetchPosts()
   }, [])
