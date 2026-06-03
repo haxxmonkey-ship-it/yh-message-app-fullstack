@@ -10,7 +10,9 @@ import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
-import { body, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
+import { body, param, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
+import rateLimit from "express-rate-limit" // Importerade express-rate-limit för att skydda inloggningsendpointen mot brute-force attacker
+
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
