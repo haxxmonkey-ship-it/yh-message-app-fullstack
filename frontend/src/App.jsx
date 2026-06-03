@@ -12,16 +12,39 @@ export const App = () => {
   const [error, setError] = useState(null)
 
   const fetchPosts = () => {
+    // Om det inte finns någon inloggad användare eller token, avbryt hämtningen direkt
+    if (!user?.response?.accessToken) {
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
-    fetch(`${BASE_URL}/messages`)
-      .then((res) => res.json())
-      .then((data) => setMessageList(data))
+    fetch(`${BASE_URL}/messages`, {
+      headers: {
+        // Skickar med användarens JWT-token till backend
+        Authorization: `Bearer ${user.response.accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          handleUnauthorized()
+          return []
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setMessageList(data)
+        }
+      })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false))
-  }//vi rekommenderar att man gör meddelanden osynliga för ej inloggade användare. Åtgärdat i backend men inte i frontend, vi har valt att inte implementera detta i frontend-koden för att inte göra den onödigt komplex.
+  }
+
   useEffect(() => {
+    // Triggar en hämtning så fort komponenten laddas eller när 'user' ändras (t.ex. vid inloggning)
     fetchPosts()
-  }, [])
+  }, [user])
 
     const addNewPost = (newMessage) => {
     setMessageList([newMessage, ...messageList])
