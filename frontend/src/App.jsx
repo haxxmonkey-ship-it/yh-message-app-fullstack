@@ -47,7 +47,8 @@ export const App = () => {
   }, [user])
 
     const addNewPost = (newMessage) => {
-    setMessageList([newMessage, ...messageList])
+    setMessageList((prevList) => [newMessage, ...prevList]) //prevList säkerställer att inga meddelanden försvinner om användaren klickar snabbt
+   
   }
 
   const handleUnauthorized = () => {
