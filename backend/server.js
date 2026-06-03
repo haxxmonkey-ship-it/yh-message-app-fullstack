@@ -10,7 +10,7 @@ import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
-import { body, param, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
+import { body, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -79,7 +79,7 @@ app.post("/register", [
   } 
 }) 
 
-app.post("/login", [ // Validering av indata för login adderad via Express-validator
+app.post("/login", loginLimiter, [ // Validering av indata för login adderad via Express-validator
   body("login").trim().notEmpty().withMessage("Username or email is required"),
   body("password").notEmpty().withMessage("Password is required")
 ], async (req, res) => {

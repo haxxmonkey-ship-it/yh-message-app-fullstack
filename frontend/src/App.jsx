@@ -21,7 +21,7 @@ export const App = () => {
     setLoading(true)
     fetch(`${BASE_URL}/messages`, {
       headers: {
-        // Skickar med användarens JWT-token till backend
+        // Skickar med användarens JWT-token till backend för att få godkännt att hämta meddelanden 
         Authorization: `Bearer ${user.response.accessToken}`,
       },
     })
