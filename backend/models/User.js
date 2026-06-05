@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    minlength: 10, // Minimum username length of 10 characters
+    maxlength: 25, // maxlängd på användarnamn satt till 25 tecken för att undvika överdrivet långa användarnamn
     trim: true,
   },
   email: {
@@ -13,10 +13,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
+    maxlength: 254, // maxlängd på email satt till 254 tecken enligt RFC 5321
   },
   password: {
     type: String,
     required: true,
+    minlength: 10, // minlängd på lösenord satt till 10 tecken för att uppmuntra starka lösenord
+    maxlength: 64, // maxlängd på lösenord satt till 64 tecken för att undvika överdrivet långa lösenord
   },
 })
 
