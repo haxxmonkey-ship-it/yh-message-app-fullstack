@@ -168,7 +168,8 @@ return res.status(400).json({ success: false, error: "Message must be between 1 
     res.status(201).json(saved)
   } catch (err) {
     console.error(err) // Loggar det faktiska felet i serverns konsol
-    res.status(500).json({ message: "Could not save message", errors: err.errors })
+        res.status(500).json({ message: "Could not save message" }) //Ändrat till status 500 och dolt err.errors för att förhindra informationsläckage av databasstrukturen (Information Disclosure).
+
   }
 })
 
