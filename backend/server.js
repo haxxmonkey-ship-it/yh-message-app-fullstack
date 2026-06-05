@@ -8,10 +8,10 @@ import jwt from "jsonwebtoken"
 import { Message } from "./models/Message.js"
 import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
+import { loginLimiter } from "./middleware/loginLimiter.js" // Importerade loginLimiter-middleware för att skydda inloggningsendpointen mot brute-force attacker
 import "./config/db.js"
 import listEndpoints from "express-list-endpoints"
 import { body, param, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
-import rateLimit from "express-rate-limit" // Importerade express-rate-limit för att skydda inloggningsendpointen mot brute-force attacker
 
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
@@ -48,7 +48,7 @@ app.post("/register", [
 
     if (existingUser) {
       const field = existingUser.email === email ? "email" : "username"
-      return res.status(400).json({
+      return res.status(400).json({ 
         success: false,
         message: `A user with this ${field} already exists`
       })
@@ -74,7 +74,7 @@ app.post("/register", [
     })
   } catch (error) { 
     console.error(error) // Loggar det faktiska felet i serverns konsol
-    res.status(400).json({
+    res.status(500).json({ //Ändrat från 400 till 500 för att bättre reflektera att det är ett serverfel, inte ett klientfel.
       success: false,
       message: "Something went wrong", // Förenklade felmeddelandet som skickas till klienten för att inte exponera potentiellt känslig information.
     })
@@ -167,7 +167,8 @@ return res.status(400).json({ success: false, error: "Message must be between 1 
     const saved = await message.save()
     res.status(201).json(saved)
   } catch (err) {
-    res.status(400).json({ message: "Could not save message", errors: err.errors })
+    console.error(err) // Loggar det faktiska felet i serverns konsol
+    res.status(500).json({ message: "Could not save message", errors: err.errors })
   }
 })
 
@@ -194,7 +195,7 @@ app.patch("/messages/:id", [
     const updated = await message.populate("user", "username")
     res.json(updated)
   } catch (error) {
-    res.status(400).json({ error: "Could not update message" })
+    res.status(500).json({ error: "Could not update message" }) //Ändrat från 400 till 500 för att bättre reflektera att det är ett serverfel, inte ett klientfel.
   }
 })
 
@@ -205,7 +206,7 @@ app.delete("/messages/:id", [
   
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-return res.status(400).json({ success: false, error: "Invalid database ID", errors: errors.array() }) //Adderade mer detaljerad information om valideringsfel i svaret.
+return res.status(400).json({ success: false, error: "Invalid database ID", errors: errors.array() })
 }
   try {
     const message = await Message.findById(req.params.id)
@@ -218,7 +219,7 @@ return res.status(400).json({ success: false, error: "Invalid database ID", erro
     await message.deleteOne()
     res.status(204).send()
   } catch (error) {
-    res.status(400).json({ error: "Could not delete message" })
+    res.status(500).json({ error: "Could not delete message" })
   }
 })
 
