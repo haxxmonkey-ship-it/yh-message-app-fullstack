@@ -49,11 +49,6 @@ app.post("/register", [
   }
 })
 
-<<<<<<< HEAD
-app.post("/login", loginLimiter, [
-  body("login").trim().notEmpty(),
-  body("password").notEmpty()
-=======
     const hashedPassword = await bcrypt.hash(password, 10) 
     const user = new User({ username: username.trim(), email, password: hashedPassword }) 
 
@@ -84,7 +79,6 @@ app.post("/login", loginLimiter, [
 app.post("/login", loginLimiter, [ // Validering av indata för login adderad via Express-validator
   body("login").trim().notEmpty().isLength({ max: 254 }).withMessage("Username or email is required"), // Validerar att login-fältet inte är tomt och inte överstiger 254 tecken (maxlängd för email enligt RFC 5321)
   body("password").notEmpty().isLength({ min: 10, max: 64 }).withMessage("Password is required and must be between 10 and 64 characters") // Validerar att password-fältet inte är tomt och har en rimlig längd (minst 10 tecken, max 64 tecken)
->>>>>>> 3a4ea7ee0caed0d77de75f03473b5ca6ba53e97f
 ], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) return res.status(400).json({ success: false, message: "Validation failed" })
