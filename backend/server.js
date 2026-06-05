@@ -49,9 +49,42 @@ app.post("/register", [
   }
 })
 
+<<<<<<< HEAD
 app.post("/login", loginLimiter, [
   body("login").trim().notEmpty(),
   body("password").notEmpty()
+=======
+    const hashedPassword = await bcrypt.hash(password, 10) 
+    const user = new User({ username: username.trim(), email, password: hashedPassword }) 
+
+    const accessToken = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" } // Sänkte token expiration time till 1 timme för ökad säkerhet
+    )
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      response: {
+        username: user.username,
+        id: user._id,
+        accessToken,
+      },
+    })
+  } catch (error) { 
+    console.error(error) // Loggar det faktiska felet i serverns konsol
+    res.status(500).json({ //Ändrat från 400 till 500 för att bättre reflektera att det är ett serverfel, inte ett klientfel.
+      success: false,
+      message: "Something went wrong", // Förenklade felmeddelandet som skickas till klienten för att inte exponera potentiellt känslig information.
+    })
+  } 
+}) 
+
+app.post("/login", loginLimiter, [ // Validering av indata för login adderad via Express-validator
+  body("login").trim().notEmpty().isLength({ max: 254 }).withMessage("Username or email is required"), // Validerar att login-fältet inte är tomt och inte överstiger 254 tecken (maxlängd för email enligt RFC 5321)
+  body("password").notEmpty().isLength({ min: 10, max: 64 }).withMessage("Password is required and must be between 10 and 64 characters") // Validerar att password-fältet inte är tomt och har en rimlig längd (minst 10 tecken, max 64 tecken)
+>>>>>>> 3a4ea7ee0caed0d77de75f03473b5ca6ba53e97f
 ], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) return res.status(400).json({ success: false, message: "Validation failed" })
