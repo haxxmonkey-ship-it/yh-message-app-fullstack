@@ -82,8 +82,8 @@ app.post("/register", [
 }) 
 
 app.post("/login", loginLimiter, [ // Validering av indata för login adderad via Express-validator
-  body("login").trim().notEmpty().withMessage("Username or email is required"),
-  body("password").notEmpty().withMessage("Password is required")
+  body("login").trim().notEmpty().isLength({ max: 254 }).withMessage("Username or email is required"), // Validerar att login-fältet inte är tomt och inte överstiger 254 tecken (maxlängd för email enligt RFC 5321)
+  body("password").notEmpty().isLength({ min: 6, max: 64 }).withMessage("Password is required") // Validerar att password-fältet inte är tomt och har en rimlig längd (minst 6 tecken, max 64 tecken)
 ], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
