@@ -8,11 +8,10 @@ import jwt from "jsonwebtoken"
 import { Message } from "./models/Message.js"
 import { User } from "./models/User.js"
 import { authenticateUser } from "./middleware/auth.js"
-import "./config/db.js"
+import { loginLimiter } from "./middleware/loginLimiter.js" // Importerade loginLimiter-middleware för att skydda inloggningsendpointen mot brute-force attacker.
+import { connectDB } from "./config/db.js" // Importerar funktionen för att starta databasen stabilt
 import listEndpoints from "express-list-endpoints"
 import { body, param, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
-import rateLimit from "express-rate-limit" // Importerade express-rate-limit för att skydda inloggningsendpointen mot brute-force attacker
-
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -221,6 +220,8 @@ return res.status(400).json({ success: false, error: "Invalid database ID", erro
     res.status(400).json({ error: "Could not delete message" })
   }
 })
+
+await connectDB()
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`)
