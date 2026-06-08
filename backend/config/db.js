@@ -1,13 +1,12 @@
 import mongoose from "mongoose"
 
-const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/messages"
-
-mongoose.connect(mongoUrl)
-
-mongoose.connection.once("open", () => {
-  console.log("Connected to MongoDB")
-})
-
-mongoose.connection.on("error", err => {
-  console.error("connection error:", err)
-})
+export const connectDB = async () => {
+  try {
+    const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/messages"
+    await mongoose.connect(mongoUrl)
+    console.log("Connected to MongoDB")
+  } catch (err) {
+    console.error("connection error:", err)
+    process.exit(1)
+  }
+}
