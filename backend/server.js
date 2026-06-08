@@ -1,5 +1,5 @@
 import "dotenv/config"
-import helmet from "helmet"// Helmet hjälper till att säkra Express-applikationen genom att ställa in olika HTTP-headers som skyddar mot vanliga sårbarheter.
+import helmet from "helmet"
 import cors from "cors" //ändra så bara vår frontend kan göra requests, istället för att tillåta alla origins. Det ökar säkerheten genom att begränsa vilka domäner som kan interagera med vår backend.
 import express from "express"
 import mongoose from "mongoose"
