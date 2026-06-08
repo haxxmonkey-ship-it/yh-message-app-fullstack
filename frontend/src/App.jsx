@@ -80,16 +80,15 @@ export const App = () => {
               onClick={() => setModal("register")}
               className="auth-button"
             >
-              Register
-            </button>
-          </div>
-        )}
+                Register
+          </button>
+        </div>
+      )}
       {modal && (
         <AuthModal
           mode={modal}
           onClose={() => setModal(null)}
           onSuccess={(data) => { 
-            console.log("User logged in:", data)
             setUser(data) 
             setModal(null) 
           }}
