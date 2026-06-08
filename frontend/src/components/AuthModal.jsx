@@ -4,10 +4,10 @@ import { BASE_URL } from "../api"
 export const AuthModal = ({ mode, onClose, onSuccess }) => {
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
-  const [login, setLogin] = useState("")
+  // Initierar login med username för att säkerställa att inloggningsfältet 
+  // skickar rätt data (login-nyckel) till backend för verifiering.
+  const [login, setLogin] = useState(username) 
   const [password, setPassword] = useState("")
-  const [error, setError] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
