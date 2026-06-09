@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
   res.send(listEndpoints(app))
 })
 
-app.post("/register", [
+app.post("/register", loginLimiter, [ // Validering av indata för register adderad via Express-validator
   body("username").isLength({ min: 6, max: 25 }).withMessage("Username must be between 6 and 25 characters"), // Adderade validering för användarnamn
   body("email").isEmail().normalizeEmail(), // Validerar att email är i korrekt format och normaliserar det
   body("password").isLength({ min: 10, max: 64 }).withMessage("Password must be between 10 and 64 characters") // Adderade validering för lösenordslängd
