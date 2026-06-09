@@ -58,6 +58,7 @@ app.post("/register", loginLimiter, [ // Validering av indata för register adde
 
     const hashedPassword = await bcrypt.hash(password, 10) 
     const user = new User({ username: username.trim(), email, password: hashedPassword }) 
+    await user.save() // Säkerställer att användaren sparas i databasen innan vi genererar token och skickar svar, vilket minskar risken för att en token genereras för en användare som inte faktiskt skapats på grund av ett databasfel eller liknande problem.
 
     const accessToken = jwt.sign(
       { userId: user._id, username: user.username },
