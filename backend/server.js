@@ -12,6 +12,7 @@ import { loginLimiter } from "./middleware/loginLimiter.js" // Importerade login
 import { connectDB } from "./config/db.js" // Importerar funktionen för att starta databasen stabilt
 import listEndpoints from "express-list-endpoints"
 import { body, param, validationResult } from "express-validator" // Importerade express-validator för ökad validering av indata
+import { globalLimiter } from "./middleware/rateLimiter.js" // Global limiter som skyddar alla endpoints mot överbelastningsattacker (DoS) och fixar CodeQL-varningarna
 
 if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not set in .env")
 
@@ -24,11 +25,13 @@ app.use(cors({
 app.use(express.json())
 // Vi föreslår att säkra session-tokeln genom att använda HttpOnly cookies istället för att skicka den i JSON-responsen, vilket minskar risken för XSS-attacker. Det här innebär större ändringar i övrig kod för att hantera autentisering och session, vi har valt att inte genomföra detta själva. 
 
+app.use(globalLimiter) // Använder globalLimiter som middleware för att skydda alla endpoints mot överbelastningsattacker (DoS) och fixar CodeQL-varningarna
+
 app.get("/", (req, res) => {
   res.send(listEndpoints(app))
 })
 
-app.post("/register", rateLimiter, [ // Validering av indata för register endpoint adderad via Express-validator
+app.post("/register", [
   body("username").isLength({ min: 6, max: 25 }).withMessage("Username must be between 6 and 25 characters"), // Adderade validering för användarnamn
   body("email").isEmail().normalizeEmail(), // Validerar att email är i korrekt format och normaliserar det
   body("password").isLength({ min: 10, max: 64 }).withMessage("Password must be between 10 and 64 characters") // Adderade validering för lösenordslängd
@@ -139,7 +142,7 @@ app.post("/login", loginLimiter, [ // Validering av indata för login adderad vi
 
 
 
-app.get("/messages", authenticateUser, rateLimiter, async (req, res) => { //Lade till authenticateUser för att säkerställa att endast inloggade användare kan hämta meddelanden. // Lade till rateLimiter för att skydda endpointen mot brute-force attacker.
+app.get("/messages", authenticateUser, async (req, res) => { //Lade till authenticateUser för att säkerställa att endast inloggade användare kan hämta meddelanden.
   try {
     const messages = await Message.find()
       .sort({ createdAt: "desc" })
@@ -153,7 +156,7 @@ app.get("/messages", authenticateUser, rateLimiter, async (req, res) => { //Lade
 })
 
 app.post("/messages", [
-  authenticateUser, rateLimiter, // lade till rateLimiter för att skydda endpointen mot brute-force attacker.
+  authenticateUser,
   body("message").trim().isLength({ min: 1, max: 250 }).withMessage("Message must be between 1 and 250 characters")
 ], async (req, res) => {
   const errors = validationResult(req)
